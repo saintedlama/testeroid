@@ -38,7 +38,7 @@ namespace Testeroid
             var silentOption = app.Option("--silent", "Do not write to standard output.", CommandOptionType.NoValue);
             var verboseOption = app.Option("--verbose", "Write verbose information to standard output.", CommandOptionType.NoValue);
 
-            var reportOption = app.Option("--report <REPORT>", "Specify which reports to create: console, cobertura or lcov.By default console, cobertura and lcov are created", CommandOptionType.MultipleValue);
+            var reportOption = app.Option("--report <REPORT>", "Specify which reports to create: console, cobertura, opencover or lcov.By default console, cobertura and lcov are created", CommandOptionType.MultipleValue);
             
             var testLoggerOption = app.Option("--test-logger <LOGGER>", "Specify which logger should be used for 'dotnet test'.", CommandOptionType.MultipleValue);
 
@@ -60,7 +60,12 @@ namespace Testeroid
                 }
 
                 var buildConfiguration = buildConfigurationOption.Value() ?? "Debug";
-                var reports = reportOption.HasValue() ? reportOption.Values : new List<string>() { "cobertura", "lcov", "console" };
+                var reports = reportOption.HasValue() ? reportOption.Values : new List<string>() { 
+                    "opencover",
+                    "cobertura",
+                    "lcov",
+                    "console" 
+                };
 
                 var excludes = excludeOption.Values.ToArray();
                 var includes = includeOption.Values.ToArray();
@@ -174,6 +179,7 @@ namespace Testeroid
         private static IReport BuildResultReportsPipeline(string outputPath, List<string> reports)
         {
             return new ReportPipeline(
+                ShouldEmitReport(reports, "opencover") ? new OpenCoverReport(outputPath) : null,
                 ShouldEmitReport(reports, "cobertura") ? new CoberturaReport(outputPath) : null,
                 ShouldEmitReport(reports, "lcov") ? new LcovReport(outputPath) : null,
                 ShouldEmitReport(reports, "console") ? new ConsoleSummaryReport() : null
