@@ -1,14 +1,7 @@
 image: Visual Studio 2017
-branches:
-  only:
-  - master
 before_build:
   - cmd: git submodule update --init --recursive
-  - cmd: dotnet --version
-  - cmd: dotnet tool install coveralls.net --global
-build_script:
-  - cmd: dotnet build
-test_script: 
-  - cmd: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover test/Testeroid.Tests/Testeroid.Tests.csproj
-  - ps: csmacnz.Coveralls --opencover -i C:\projects\testeroid\test\Testeroid.Tests\coverage.opencover.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_JOB_ID
+test_script:
+  - cmd: dotnet run --project src\Testeroid\ --exclude-path coverlet --exclude-path fixtures
+  - ps: csmacnz.Coveralls --opencover -i C:\projects\testeroid\coverage\coverage.opencover.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_JOB_ID
 deploy: off
