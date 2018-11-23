@@ -1,6 +1,7 @@
 # Testeroid
 
-[![Travis build status](https://travis-ci.org/saintedlama/testeroid.svg?branch=master)](https://travis-ci.org/saintedlama/testeroid)(https://ci.appveyor.com/project/saintedlama/testeroid)
+[![Travis build status](https://travis-ci.org/saintedlama/testeroid.svg?branch=master)](https://travis-ci.org/saintedlama/testeroid)
+[![Appveyor build status](https://ci.appveyor.com/api/projects/status/oijtj75bopgxgudn?svg=true)](https://ci.appveyor.com/project/saintedlama/testeroid)
 [![Coverage Status](https://coveralls.io/repos/saintedlama/testeroid/badge.svg?branch=)](https://coveralls.io/r/saintedlama/testeroid?branch=master)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
