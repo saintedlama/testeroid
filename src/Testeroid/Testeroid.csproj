@@ -12,7 +12,7 @@
       Dotnet test on steroids - discovers testable projects, executes tests with code coverage, merges results of all test projects into one coverage result and generates reports
     </Description>
     <PackageProjectUrl>https://github.com/saintedlama/testeroid</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/saintedlama/testeroid/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/saintedlama/testeroid</RepositoryUrl>
   </PropertyGroup>
