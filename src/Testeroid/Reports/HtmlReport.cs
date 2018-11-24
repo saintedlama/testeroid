@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using Coverlet.Core;
+using Palmmedia.ReportGenerator.Core;
 
 namespace Testeroid.Reports
 {
@@ -19,9 +20,23 @@ namespace Testeroid.Reports
 
         public void Generate(CoverageResult coverageResult)
         {
+            // TODO: Pass generated report to file to report generator
+                    //var reportTypes = _reportTypes.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            new Generator().GenerateReport(new ReportConfiguration(
+                reportFilePatterns: new string[] { @"C:\p\github\testeroid\coverage\coverage.cobertura.xml" },
+                targetDirectory: _outputPath,
+                historyDirectory: null,
+                reportTypes: new[] { "html" },
+                assemblyFilters: new string[] { },
+                classFilters: new string[] { },
+                fileFilters: new string[] { },
+                verbosityLevel: null,
+                tag: null
+            ));
+
             // TODO: Add source code
             // TODO: Build a report for every namespace/module/class
-            File.WriteAllText(Path.Combine(_outputPath), BuildOverview(coverageResult));
+            //File.WriteAllText(Path.Combine(_outputPath), BuildOverview(coverageResult));
         }
 
         private string BuildOverview(CoverageResult result)

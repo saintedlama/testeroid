@@ -64,7 +64,8 @@ namespace Testeroid
                     "opencover",
                     "cobertura",
                     "lcov",
-                    "console" 
+                    "html",
+                    "console", 
                 };
 
                 var excludes = excludeOption.Values.ToArray();
@@ -182,6 +183,7 @@ namespace Testeroid
                 ShouldEmitReport(reports, "opencover") ? new OpenCoverReport(outputPath) : null,
                 ShouldEmitReport(reports, "cobertura") ? new CoberturaReport(outputPath) : null,
                 ShouldEmitReport(reports, "lcov") ? new LcovReport(outputPath) : null,
+                ShouldEmitReport(reports, "html") ? new HtmlReport(outputPath) : null,
                 ShouldEmitReport(reports, "console") ? new ConsoleSummaryReport() : null
             );
         }

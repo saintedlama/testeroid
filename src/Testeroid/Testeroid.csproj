@@ -20,6 +20,7 @@
   <ItemGroup>
     <PackageReference Include="ConsoleTables" Version="2.2.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.3" />
+    <PackageReference Include="ReportGenerator.Core" Version="4.0.0-alpha6" />
   </ItemGroup>
 
   <ItemGroup>
