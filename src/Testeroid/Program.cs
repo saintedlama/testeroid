@@ -163,7 +163,7 @@ namespace Testeroid
                     {
                         Information($"  Saving reports to {reportOutputPath}");
 
-                        resultingReports.Generate(coverageResult);
+                        resultingReports.Generate(new ReportContext { CoverageResult = coverageResult });
                     }
                     else
                     {
@@ -191,37 +191,6 @@ namespace Testeroid
         private static bool ShouldEmitReport(List<string> reports, string report)
         {
             return reports.Any(r => r.Equals(report, StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        private static void BuildHtmlReport(string outputDirectory, CoverageResult result)
-        {
-            var report = new HtmlReport(outputDirectory);
-            report.Generate(result);
-        }
-
-        private static void PrintConsoleReport(CoverageResult result)
-        {
-            var summary = new CoverageSummary();
-            var coverageTable = new ConsoleTable("Module", "Line", "Branch", "Method");
-
-            foreach (var module in result.Modules)
-            {
-                var linePercent = summary.CalculateLineCoverage(module.Value).Percent * 100;
-                var branchPercent = summary.CalculateBranchCoverage(module.Value).Percent * 100;
-                var methodPercent = summary.CalculateMethodCoverage(module.Value).Percent * 100;
-
-                coverageTable.AddRow(Path.GetFileNameWithoutExtension(module.Key), $"{linePercent}%", $"{branchPercent}%", $"{methodPercent}%");
-            }
-
-            var overallLineCoverage = summary.CalculateLineCoverage(result.Modules).Percent * 100;
-            var overallBranchCoverage = summary.CalculateBranchCoverage(result.Modules).Percent * 100;
-            var overallMethodCoverage = summary.CalculateMethodCoverage(result.Modules).Percent * 100;
-
-            Information(coverageTable.ToMinimalString());
-
-            Information($"Total Line: {overallLineCoverage}%");
-            Information($"Total Branch: {overallBranchCoverage}%");
-            Information($"Total Method: {overallMethodCoverage}%");
         }
 
         private static string BuildIntermediateCoverletReport(CoverageResult result)

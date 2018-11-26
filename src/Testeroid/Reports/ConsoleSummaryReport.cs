@@ -9,12 +9,14 @@ namespace Testeroid.Reports
 {
     public class ConsoleSummaryReport : IReport
     {
-        public void Generate(CoverageResult coverageResult)
+        public void Generate(ReportContext reportContext)
         {
             var summary = new CoverageSummary();
             var coverageTable = new ConsoleTable("Module", "Line", "Branch", "Method");
 
-            foreach (var module in coverageResult.Modules)
+            var modules = reportContext.CoverageResult.Modules;
+
+            foreach (var module in modules)
             {
                 var linePercent = summary.CalculateLineCoverage(module.Value).Percent * 100;
                 var branchPercent = summary.CalculateBranchCoverage(module.Value).Percent * 100;
@@ -23,9 +25,9 @@ namespace Testeroid.Reports
                 coverageTable.AddRow(Path.GetFileNameWithoutExtension(module.Key), $"{linePercent}%", $"{branchPercent}%", $"{methodPercent}%");
             }
 
-            var overallLineCoverage = summary.CalculateLineCoverage(coverageResult.Modules).Percent * 100;
-            var overallBranchCoverage = summary.CalculateBranchCoverage(coverageResult.Modules).Percent * 100;
-            var overallMethodCoverage = summary.CalculateMethodCoverage(coverageResult.Modules).Percent * 100;
+            var overallLineCoverage = summary.CalculateLineCoverage(modules).Percent * 100;
+            var overallBranchCoverage = summary.CalculateBranchCoverage(modules).Percent * 100;
+            var overallMethodCoverage = summary.CalculateMethodCoverage(modules).Percent * 100;
 
             Information();
             Information(coverageTable.ToMinimalString());
@@ -33,6 +35,8 @@ namespace Testeroid.Reports
             Information($"Total Line: {overallLineCoverage}%");
             Information($"Total Branch: {overallBranchCoverage}%");
             Information($"Total Method: {overallMethodCoverage}%");
+
+            reportContext.AddReport(new Report { Format = "console" });
         }
     }
 }

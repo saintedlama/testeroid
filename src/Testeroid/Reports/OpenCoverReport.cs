@@ -13,13 +13,15 @@ namespace Testeroid.Reports
             _outputPath = outputPath;
         }
 
-        public void Generate(CoverageResult coverageResult)
+        public void Generate(ReportContext reportContext)
         {
             var reporter = new ReporterFactory("opencover").CreateReporter();
 
             var outputFile = Path.Combine(_outputPath, "coverage.opencover.xml");
 
-            File.WriteAllText(outputFile, reporter.Report(coverageResult));
+            File.WriteAllText(outputFile, reporter.Report(reportContext.CoverageResult));
+
+            reportContext.AddReport(new Report { Format = "opencover", Path = outputFile });
         }
     }
 }
