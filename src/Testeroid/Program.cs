@@ -39,7 +39,7 @@ namespace Testeroid
             var verboseOption = app.Option("--verbose", "Write verbose information to standard output.", CommandOptionType.NoValue);
 
             var reportOption = app.Option("--report <REPORT>", "Specify which reports to create: console, cobertura, opencover or lcov.By default console, cobertura and lcov are created", CommandOptionType.MultipleValue);
-            
+
             var testLoggerOption = app.Option("--test-logger <LOGGER>", "Specify which logger should be used for 'dotnet test'.", CommandOptionType.MultipleValue);
 
             var excludeOption = app.Option("--exclude <PATTERN>", "Excludes assembly or types using '[Assembly-Filter]Type-Filter' syntax with wildcards '*' and '?'. For example: --exclude '[*]Testeroid.*' will exclude all types in Testeroid namespace in any assembly.", CommandOptionType.MultipleValue);
@@ -60,17 +60,17 @@ namespace Testeroid
                 }
 
                 var buildConfiguration = buildConfigurationOption.Value() ?? "Debug";
-                var reports = reportOption.HasValue() ? reportOption.Values : new List<string>() { 
+                var reports = reportOption.HasValue() ? reportOption.Values : new List<string>() {
                     "opencover",
                     "cobertura",
                     "lcov",
-                    "console" 
+                    "console"
                 };
 
                 var excludes = excludeOption.Values.ToArray();
                 var includes = includeOption.Values.ToArray();
-                
-                var testLogger = testLoggerOption.HasValue()?$"--logger {testLoggerOption.Value()}":String.Empty;
+
+                var testLogger = testLoggerOption.HasValue() ? $"--logger {testLoggerOption.Value()}" : String.Empty;
 
                 // Discover test projects
                 var workingDirectory = WorkingDirectory.Discover(workingDirectoryOption.Value() ?? Directory.GetCurrentDirectory(), excludePathOption.Values);
@@ -117,56 +117,64 @@ namespace Testeroid
                 {
                     var project = workingDirectory.TestProjects[i];
 
-                    var testDll = project.GetDllPath(buildConfiguration);
-
-                    if (!File.Exists(testDll))
+                    try
                     {
-                        Exit($"Expected the project {project.ProjectFile.FullName} to build a test dll to {testDll} but this file does not exits", 1);
-                    }
+                        var testDll = project.GetDllPath(buildConfiguration);
 
-                    Coverage coverage = new Coverage(testDll, excludes, includes, new string[0], lastCoverageReport);
-                    coverage.PrepareModules();
-
-                    var dotnetTest = "dotnet".Execute($"test {project.GetDirectory()} --no-build --no-restore {testLogger}", workingDirectory: workingDirectory.Path.FullName);
-
-                    Verbose(dotnetTest.StandardOutput);
-
-                    if (dotnetTest.ExitCode != 0)
-                    {
-                        Step(StepResult.Failed, $"Test execution failed for {project.ProjectFile.FullName}");
-                        Information(dotnetTest.StandardError);
-
-                        exitCode = 1;
-                    }
-                    else
-                    {
-                        Step(StepResult.Passed, $"Tested {workingDirectory.RelativePath(project.ProjectFile)} ({dotnetTest.ElapsedMilliseconds}ms)");
-                    }
-
-                    var coverageResult = coverage.GetCoverageResult();
-
-                    if (lastCoverageReport != null && File.Exists(lastCoverageReport))
-                    {
-                        try
+                        if (!File.Exists(testDll))
                         {
-                            File.Delete(lastCoverageReport);
+                            Exit($"Expected the project {project.ProjectFile.FullName} to build a test dll to {testDll} but this file does not exits", 1);
                         }
-                        catch (Exception ex)
+
+                        Coverage coverage = new Coverage(testDll, excludes, includes, new string[0], lastCoverageReport);
+                        coverage.PrepareModules();
+
+                        var dotnetTest = "dotnet".Execute($"test {project.GetDirectory()} --no-build --no-restore {testLogger}", workingDirectory: workingDirectory.Path.FullName);
+
+                        Verbose(dotnetTest.StandardOutput);
+
+                        if (dotnetTest.ExitCode != 0)
                         {
-                            Verbose($"Could not delete intermediate coverage report {lastCoverageReport} due to error {ex.Message}");
-                            Verbose($"{ex.StackTrace.ToString()}");
+                            Step(StepResult.Failed, $"Test execution failed for {project.ProjectFile.FullName}");
+                            Information(dotnetTest.StandardError);
+
+                            exitCode = 1;
+                        }
+                        else
+                        {
+                            Step(StepResult.Passed, $"Tested {workingDirectory.RelativePath(project.ProjectFile)} ({dotnetTest.ElapsedMilliseconds}ms)");
+                        }
+
+                        var coverageResult = coverage.GetCoverageResult();
+
+                        if (lastCoverageReport != null && File.Exists(lastCoverageReport))
+                        {
+                            try
+                            {
+                                File.Delete(lastCoverageReport);
+                            }
+                            catch (Exception ex)
+                            {
+                                Verbose($"Could not delete intermediate coverage report {lastCoverageReport} due to error {ex.Message}");
+                                Verbose($"{ex.StackTrace.ToString()}");
+                            }
+                        }
+
+                        if (i == workingDirectory.TestProjects.Count - 1)
+                        {
+                            Information($"  Saving reports to {reportOutputPath}");
+
+                            resultingReports.Generate(coverageResult);
+                        }
+                        else
+                        {
+                            lastCoverageReport = BuildIntermediateCoverletReport(coverageResult);
                         }
                     }
-
-                    if (i == workingDirectory.TestProjects.Count - 1)
+                    catch (Exception ex)
                     {
-                        Information($"  Saving reports to {reportOutputPath}");
-
-                        resultingReports.Generate(coverageResult);
-                    }
-                    else
-                    {
-                        lastCoverageReport = BuildIntermediateCoverletReport(coverageResult);
+                        Information($"An error occurred while executing 'dotnet test' for project '{project.GetDirectory()}'");
+                        throw ex;
                     }
                 }
 
@@ -189,12 +197,6 @@ namespace Testeroid
         private static bool ShouldEmitReport(List<string> reports, string report)
         {
             return reports.Any(r => r.Equals(report, StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        private static void BuildHtmlReport(string outputDirectory, CoverageResult result)
-        {
-            var report = new HtmlReport(outputDirectory);
-            report.Generate(result);
         }
 
         private static void PrintConsoleReport(CoverageResult result)
