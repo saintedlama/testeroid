@@ -23,6 +23,7 @@
     <PackageReference Include="ConsoleTables" Version="2.2.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.3" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
+    <PackageReference Include="ReportGenerator.Core" Version="4.0.0-alpha6" />
   </ItemGroup>
 
   <ItemGroup>

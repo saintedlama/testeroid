@@ -4,6 +4,6 @@ namespace Testeroid.Reports
 {
     public interface IReport
     {
-        void Generate(CoverageResult coverageResult);
+        void Generate(ReportContext report);
     }
 }
