@@ -51,8 +51,10 @@ Testeroid recognize test projects by testing if they contain a `<IsTestable>true
 
 ## Roadmap
 
-* [ ] HTML Reports
+* [x] HTML Reports
 
 ## Kudos
 
 Most of the work that is done by `testeroid` is based or done by [coverlet](https://github.com/tonerdo/coverlet).
+
+HTML Reports generated with [Report Generator](https://github.com/danielpalme/ReportGenerator).
