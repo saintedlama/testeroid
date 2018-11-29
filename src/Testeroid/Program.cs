@@ -65,7 +65,7 @@ namespace Testeroid
                     "cobertura",
                     "lcov",
                     "html",
-                    "console", 
+                    "console",
                 };
 
                 var excludes = excludeOption.Values.ToArray();
@@ -137,9 +137,18 @@ namespace Testeroid
                         if (dotnetTest.ExitCode != 0)
                         {
                             Step(StepResult.Failed, $"Test execution failed for {project.ProjectFile.FullName}");
-                            Information(dotnetTest.StandardError);
 
-                            exitCode = 1;
+                            if (!String.IsNullOrWhiteSpace(dotnetTest.StandardError))
+                            {
+                                Information(dotnetTest.StandardError);
+                            }
+
+                            if (!String.IsNullOrWhiteSpace(dotnetTest.StandardOutput))
+                            {
+                                Information(dotnetTest.StandardOutput);
+                            }
+
+                            exitCode = dotnetTest.ExitCode;
                         }
                         else
                         {
@@ -161,11 +170,13 @@ namespace Testeroid
                             }
                         }
 
+                        DeleteFile(lastCoverageReport);
+
                         if (i == workingDirectory.TestProjects.Count - 1)
                         {
-                            Information($"  Saving reports to {reportOutputPath}");
-
                             resultingReports.Generate(new ReportContext { CoverageResult = coverageResult });
+
+                            Step(StepResult.Passed, $"Saved reports to {reportOutputPath}");
                         }
                         else
                         {
@@ -182,7 +193,32 @@ namespace Testeroid
                 return exitCode;
             });
 
-            return app.Execute(args);
+            try
+            {
+                return app.Execute(args);
+            }
+            catch (CommandParsingException cpex)
+            {
+                Information(cpex.Message);
+                return 2;
+            }
+        }
+
+        private static void DeleteFile(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                return;
+            }
+
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                Verbose($"Could not delete {filePath} due to error: {ex.Message}");
+            }
         }
 
         private static IReport BuildResultReportsPipeline(string outputPath, List<string> reports)
