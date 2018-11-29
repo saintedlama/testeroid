@@ -157,19 +157,6 @@ namespace Testeroid
 
                         var coverageResult = coverage.GetCoverageResult();
 
-                        if (lastCoverageReport != null && File.Exists(lastCoverageReport))
-                        {
-                            try
-                            {
-                                File.Delete(lastCoverageReport);
-                            }
-                            catch (Exception ex)
-                            {
-                                Verbose($"Could not delete intermediate coverage report {lastCoverageReport} due to error {ex.Message}");
-                                Verbose($"{ex.StackTrace.ToString()}");
-                            }
-                        }
-
                         DeleteFile(lastCoverageReport);
 
                         if (i == workingDirectory.TestProjects.Count - 1)
@@ -217,7 +204,8 @@ namespace Testeroid
             }
             catch (Exception ex)
             {
-                Verbose($"Could not delete {filePath} due to error: {ex.Message}");
+                Verbose($"Could not delete intermediate coverage report {filePath} due to error {ex.Message}");
+                Verbose($"{ex.StackTrace.ToString()}");
             }
         }
 
