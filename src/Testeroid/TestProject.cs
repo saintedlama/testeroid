@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using static Testeroid.CommandLine.CommandLineUI;
 
 namespace Testeroid
 {
@@ -22,7 +23,14 @@ namespace Testeroid
 
         public string GetBuildDirectory(string buildConfiguration)
         {
-            return Path.Combine(GetDirectory(), "bin", buildConfiguration, GetTargetFrameworks().First());
+            var targetFramework = GetTargetFrameworks().FirstOrDefault();
+
+            if (targetFramework == null)
+            {
+                Exit($"Could not get a target framework from {ProjectFile.FullName}", 2);
+            }
+
+            return Path.Combine(GetDirectory(), "bin", buildConfiguration, targetFramework);
         }
 
         public string GetDllPath(string buildConfiguration)
