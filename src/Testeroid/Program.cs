@@ -200,7 +200,7 @@ namespace Testeroid
             catch (CommandParsingException cpex)
             {
                 Information(cpex.Message);
-                return 2;
+                return 10;
             }
         }
 
