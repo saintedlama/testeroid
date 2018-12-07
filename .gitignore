@@ -343,3 +343,6 @@ ASALocalRun/
 
 # Coverage output directory
 coverage/
+
+# Sonarqube
+.sonarqube/
