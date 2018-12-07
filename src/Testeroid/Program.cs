@@ -173,7 +173,7 @@ namespace Testeroid
                     catch (Exception ex)
                     {
                         Information($"An error occurred while executing 'dotnet test' for project '{project.GetDirectory()}'");
-                        throw ex;
+                        throw;
                     }
                 }
 
