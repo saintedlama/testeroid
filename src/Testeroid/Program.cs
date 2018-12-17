@@ -130,7 +130,7 @@ namespace Testeroid
                         Coverage coverage = new Coverage(testDll, excludes, includes, new string[0], lastCoverageReport);
                         coverage.PrepareModules();
 
-                        var dotnetTest = "dotnet".Execute($"test {project.GetDirectory()} --no-build --no-restore {testLogger}", workingDirectory: workingDirectory.Path.FullName);
+                        var dotnetTest = "dotnet".Execute($"test {EscapeDirectory(project.GetDirectory())} --no-build --no-restore {testLogger}", workingDirectory: workingDirectory.Path.FullName);
 
                         Verbose(dotnetTest.StandardOutput);
 
@@ -170,7 +170,7 @@ namespace Testeroid
                             lastCoverageReport = BuildIntermediateCoverletReport(coverageResult);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         Information($"An error occurred while executing 'dotnet test' for project '{project.GetDirectory()}'");
                         throw;
@@ -207,6 +207,16 @@ namespace Testeroid
                 Verbose($"Could not delete intermediate coverage report {filePath} due to error {ex.Message}");
                 Verbose($"{ex.StackTrace.ToString()}");
             }
+        }
+
+        private static string EscapeDirectory(string directory)
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
+            {
+                return $"'{directory}'";
+            }
+
+            return $"\"{directory}\"";
         }
 
         private static IReport BuildResultReportsPipeline(string outputPath, List<string> reports)
