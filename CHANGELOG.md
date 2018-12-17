@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/saintedlama/versionize) for commit guidelines.
 
-<a name="1.1.1"></a>
+<a name="1.1.2"></a>
+## 1.1.2 (2018-12-17)
+
+### Bug Fixes
+
+* escape directory in dotnet test to avoid errors with directories with whitespaces
+* throw origin exception
+
 ## 1.1.1 (2018-11-29)
 
 ### Bug Fixes
