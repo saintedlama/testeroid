@@ -37,6 +37,7 @@ namespace Testeroid
 
             var silentOption = app.Option("--silent", "Do not write to standard output.", CommandOptionType.NoValue);
             var verboseOption = app.Option("--verbose", "Write verbose information to standard output.", CommandOptionType.NoValue);
+            var timeoutOption = app.Option("--timeout", "Timeout in milliseconds to wait for a process executed in testeroid to exit. Default 50000", CommandOptionType.SingleOrNoValue);
 
             var reportOption = app.Option("--report <REPORT>", "Specify which reports to create: console, cobertura, opencover, lcov or html.By default console, cobertura and lcov are created", CommandOptionType.MultipleValue);
 
@@ -70,6 +71,7 @@ namespace Testeroid
 
                 var excludes = excludeOption.Values.ToArray();
                 var includes = includeOption.Values.ToArray();
+                var timeoutMilliseconds = timeoutOption.HasValue()?Int32.Parse(timeoutOption.Value()):50000;
 
                 var testLogger = testLoggerOption.HasValue() ? $"--logger {testLoggerOption.Value()}" : String.Empty;
 
@@ -87,7 +89,8 @@ namespace Testeroid
                 if (!noBuildOption.HasValue())
                 {
                     var build = "dotnet".Execute($"build --configuration {buildConfiguration} {(noRestoreOption.HasValue() ? "--no-restore" : "")}",
-                        workingDirectory: workingDirectory.Path.FullName);
+                        workingDirectory: workingDirectory.Path.FullName,
+                        timeoutMillisecods: timeoutMilliseconds);
 
                     if (build.ExitCode != 0)
                     {
@@ -130,7 +133,9 @@ namespace Testeroid
                         Coverage coverage = new Coverage(testDll, excludes, includes, new string[0], lastCoverageReport);
                         coverage.PrepareModules();
 
-                        var dotnetTest = "dotnet".Execute($"test {EscapeDirectory(project.GetDirectory())} --no-build --no-restore {testLogger}", workingDirectory: workingDirectory.Path.FullName);
+                        var dotnetTest = "dotnet".Execute($"test {EscapeDirectory(project.GetDirectory())} --no-build --no-restore {testLogger}",
+                            workingDirectory: workingDirectory.Path.FullName,
+                            timeoutMillisecods: timeoutMilliseconds);
 
                         Verbose(dotnetTest.StandardOutput);
 

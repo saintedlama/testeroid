@@ -4,7 +4,7 @@ namespace Testeroid
 {
     public static class StringExtensions
     {
-        public static Execution Execute(this string cmd, string arguments = null, string workingDirectory = null)
+        public static Execution Execute(this string cmd, string arguments = null, string workingDirectory = null, int timeoutMillisecods = 50000)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -16,16 +16,16 @@ namespace Testeroid
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-            
+
             process.Start();
 
             var standardOutput = process.StandardOutput.ReadToEnd();
             var standardError = process.StandardError.ReadToEnd();
 
-            process.WaitForExit();
-            
+            process.WaitForExit(timeoutMillisecods);
+
             sw.Stop();
-            
+
             return new Execution
             {
                 ExitCode = process.ExitCode,
