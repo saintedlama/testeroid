@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/saintedlama/versionize) for commit guidelines.
 
-<a name="1.1.2"></a>
+<a name="1.2.0"></a>
+## 1.2.0 (2019-2-27)
+
+### Features
+
+* add a timeout option when executing processes
+
 ## 1.1.2 (2018-12-17)
 
 ### Bug Fixes
