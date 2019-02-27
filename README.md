@@ -17,8 +17,9 @@ _how it works:_
 4. Generates reports
     * lcov
     * cobertura
+    * html
+    * opencover
     * console summary
-    * ~~html~~ (in progress)
 
 ## Installation
 
