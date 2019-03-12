@@ -71,7 +71,7 @@ namespace Testeroid
 
                 var excludes = excludeOption.Values.ToArray();
                 var includes = includeOption.Values.ToArray();
-                var timeoutMilliseconds = timeoutOption.HasValue()?Int32.Parse(timeoutOption.Value()):50000;
+                var timeoutMilliseconds = timeoutOption.HasValue() ? Int32.Parse(timeoutOption.Value()) : 2 * 60 * 1000; // 2 minutes
 
                 var testLogger = testLoggerOption.HasValue() ? $"--logger {testLoggerOption.Value()}" : String.Empty;
 
@@ -133,31 +133,38 @@ namespace Testeroid
                         Coverage coverage = new Coverage(testDll, excludes, includes, new string[0], lastCoverageReport);
                         coverage.PrepareModules();
 
-                        var dotnetTest = "dotnet".Execute($"test {EscapeDirectory(project.GetDirectory())} --no-build --no-restore {testLogger}",
-                            workingDirectory: workingDirectory.Path.FullName,
-                            timeoutMillisecods: timeoutMilliseconds);
-
-                        Verbose(dotnetTest.StandardOutput);
-
-                        if (dotnetTest.ExitCode != 0)
+                        try
                         {
-                            Step(StepResult.Failed, $"Test execution failed for {project.ProjectFile.FullName}");
+                            var dotnetTest = "dotnet".Execute($"test {EscapeDirectory(project.GetDirectory())} --no-build --no-restore {testLogger}",
+                                                        workingDirectory: workingDirectory.Path.FullName,
+                                                        timeoutMillisecods: timeoutMilliseconds);
 
-                            if (!String.IsNullOrWhiteSpace(dotnetTest.StandardError))
+                            Verbose(dotnetTest.StandardOutput);
+
+                            if (dotnetTest.ExitCode != 0)
                             {
-                                Information(dotnetTest.StandardError);
-                            }
+                                Step(StepResult.Failed, $"Test execution failed for {project.ProjectFile.FullName}");
 
-                            if (!String.IsNullOrWhiteSpace(dotnetTest.StandardOutput))
+                                if (!String.IsNullOrWhiteSpace(dotnetTest.StandardError))
+                                {
+                                    Information(dotnetTest.StandardError);
+                                }
+
+                                if (!String.IsNullOrWhiteSpace(dotnetTest.StandardOutput))
+                                {
+                                    Information(dotnetTest.StandardOutput);
+                                }
+
+                                exitCode = dotnetTest.ExitCode;
+                            }
+                            else
                             {
-                                Information(dotnetTest.StandardOutput);
+                                Step(StepResult.Passed, $"Tested {workingDirectory.RelativePath(project.ProjectFile)} ({dotnetTest.ElapsedMilliseconds}ms)");
                             }
-
-                            exitCode = dotnetTest.ExitCode;
                         }
-                        else
+                        catch (ProcessTerminationException)
                         {
-                            Step(StepResult.Passed, $"Tested {workingDirectory.RelativePath(project.ProjectFile)} ({dotnetTest.ElapsedMilliseconds}ms)");
+                            Exit($"dotnet test for {project.GetDirectory()} did not exit within {timeoutMilliseconds}ms or could not be terminated after {timeoutMilliseconds}ms", 128);
                         }
 
                         var coverageResult = coverage.GetCoverageResult();

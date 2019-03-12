@@ -1,10 +1,11 @@
+using System;
 using System.Diagnostics;
 
 namespace Testeroid
 {
     public static class StringExtensions
     {
-        public static Execution Execute(this string cmd, string arguments = null, string workingDirectory = null, int timeoutMillisecods = 50000)
+        public static Execution Execute(this string cmd, string arguments = null, string workingDirectory = null, int timeoutMillisecods = 2 * 60 * 1000)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -22,7 +23,21 @@ namespace Testeroid
             var standardOutput = process.StandardOutput.ReadToEnd();
             var standardError = process.StandardError.ReadToEnd();
 
-            process.WaitForExit(timeoutMillisecods);
+            var hasExited = process.WaitForExit(timeoutMillisecods);
+
+            if (!hasExited)
+            {
+                try
+                {
+                    process.Kill();
+                }
+                catch (Exception ex)
+                {
+                    throw new ProcessTerminationException($"Could not kill the non exiting process due to exception", ex);
+                }
+
+                throw new ProcessTerminationException($"The process did not exit within the defined timeout of {timeoutMillisecods}ms");
+            }
 
             sw.Stop();
 
@@ -34,6 +49,12 @@ namespace Testeroid
                 ElapsedMilliseconds = sw.ElapsedMilliseconds,
             };
         }
+    }
+
+    public class ProcessTerminationException : Exception
+    {
+        public ProcessTerminationException(string message) : base(message) { }
+        public ProcessTerminationException(string message, Exception ex) : base(message, ex) { }
     }
 
     public class Execution
