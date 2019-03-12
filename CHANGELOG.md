@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/saintedlama/versionize) for commit guidelines.
 
-<a name="1.2.0"></a>
+<a name="1.3.0"></a>
+## 1.3.0 (2019-3-12)
+
+### Features
+
+* increase timeout to 120 sec and kill processes that do not terminate within timeout and exit with non zero exit code
+
 ## 1.2.0 (2019-2-27)
 
 ### Features
