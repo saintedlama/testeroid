@@ -48,6 +48,9 @@ namespace Testeroid
 
             var excludePathOption = app.Option("--exclude-path <PATTERN>", "Excludes directories from test project discovery. To exclude a directory 'fixtures' use --exclude-path fixtures. Note all directories with name containing fixture will be excluded.", CommandOptionType.MultipleValue);
 
+            var testFrameworkOption = app.Option("--testframework <FRAMEWORK>", "Automatically configures testeroid for the given test framework. Currently 'xunit' is supported. Defaults to 'xunit", CommandOptionType.SingleOrNoValue);
+
+
             app.OnExecute(() =>
             {
                 if (silentOption.HasValue())
@@ -60,6 +63,10 @@ namespace Testeroid
                     CommandLineUI.Verbosity = VerbosityLevel.Verbose;
                 }
 
+                var testFramework = testFrameworkOption.HasValue() ? testFrameworkOption.Value() : "xunit";
+
+                var testeroidConfig = ConfigureFromTestFramework(testFramework, includeOption, excludeOption);
+
                 var buildConfiguration = buildConfigurationOption.Value() ?? "Debug";
                 var reports = reportOption.HasValue() ? reportOption.Values : new List<string>() {
                     "opencover",
@@ -69,11 +76,11 @@ namespace Testeroid
                     "console",
                 };
 
-                var excludes = excludeOption.Values.ToArray();
-                var includes = includeOption.Values.ToArray();
+
                 var timeoutMilliseconds = timeoutOption.HasValue() ? Int32.Parse(timeoutOption.Value()) : 2 * 60 * 1000; // 2 minutes
 
                 var testLogger = testLoggerOption.HasValue() ? $"--logger {testLoggerOption.Value()}" : String.Empty;
+
 
                 // Discover test projects
                 var workingDirectory = WorkingDirectory.Discover(workingDirectoryOption.Value() ?? Directory.GetCurrentDirectory(), excludePathOption.Values);
@@ -130,7 +137,22 @@ namespace Testeroid
                             Exit($"Expected the project {project.ProjectFile.FullName} to build a test dll to {testDll} but this file does not exits", 1);
                         }
 
-                        Coverage coverage = new Coverage(testDll, excludes, includes, new string[0], lastCoverageReport);
+
+                        var logger = new CoverletLogAdapter();
+
+                        Coverage coverage = new Coverage(
+                            testDll,
+                            testeroidConfig.IncludeFilters.ToArray(),
+                            testeroidConfig.IncludeDirectories.ToArray(),
+                            testeroidConfig.ExcludeFilters.ToArray(),
+                            testeroidConfig.ExcludedSourceFiles.ToArray(),
+                            testeroidConfig.ExcludeAttributes.ToArray(),
+                            false,
+                            lastCoverageReport,
+                            true,
+                            logger
+                        );
+
                         coverage.PrepareModules();
 
                         try
@@ -203,6 +225,29 @@ namespace Testeroid
             }
         }
 
+        private static TesteroidConfiguration ConfigureFromTestFramework(string testFramework, CommandOption includeOption, CommandOption excludeOption)
+        {
+            var excludeFilters = excludeOption.Values;
+            var includeFilters = includeOption.Values;
+            var includeDirectories = new List<string>();
+            var excludedSourceFiles = new List<string>();
+            var excludeAttributes = new List<string>();
+
+            if (testFramework.Equals("xunit", StringComparison.OrdinalIgnoreCase))
+            {
+                excludeFilters.Add("[xunit*]*");
+            }
+
+            return new TesteroidConfiguration
+            {
+                ExcludeFilters = excludeFilters,
+                IncludeFilters = includeFilters,
+                IncludeDirectories = includeDirectories,
+                ExcludedSourceFiles = excludedSourceFiles,
+                ExcludeAttributes = excludeAttributes,
+            };
+        }
+
         private static void DeleteFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
@@ -259,5 +304,14 @@ namespace Testeroid
         }
 
         static string GetAssemblyVersion() => typeof(Program).Assembly.GetName().Version.ToString();
+    }
+
+    public class TesteroidConfiguration
+    {
+        public List<string> ExcludeFilters { get; set; }
+        public List<string> IncludeFilters { get; set; }
+        public List<string> IncludeDirectories { get; set; }
+        public List<string> ExcludedSourceFiles { get; set; }
+        public List<string> ExcludeAttributes { get; set; }
     }
 }
