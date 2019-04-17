@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Text;
 
 namespace Testeroid
 {
@@ -18,10 +19,26 @@ namespace Testeroid
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
-            process.Start();
+            StringBuilder standardOutputBuilder = new StringBuilder();
+            StringBuilder standardErrorBuilder = new StringBuilder();
 
-            var standardOutput = process.StandardOutput.ReadToEnd();
-            var standardError = process.StandardError.ReadToEnd();
+            process.OutputDataReceived += (sender, eventArgs) =>
+            {
+                if (!string.IsNullOrEmpty(eventArgs.Data))
+                {
+                    standardOutputBuilder.Append(eventArgs.Data);
+                }
+            };
+
+            process.ErrorDataReceived += (sender, eventArgs) =>
+            {
+                if (!string.IsNullOrEmpty(eventArgs.Data))
+                {
+                    standardErrorBuilder.Append(eventArgs.Data);
+                }
+            };
+
+            process.Start();
 
             var hasExited = process.WaitForExit(timeoutMillisecods);
 
@@ -44,8 +61,8 @@ namespace Testeroid
             return new Execution
             {
                 ExitCode = process.ExitCode,
-                StandardError = standardError,
-                StandardOutput = standardOutput,
+                StandardOutput = standardOutputBuilder.ToString(),
+                StandardError = standardErrorBuilder.ToString(),
                 ElapsedMilliseconds = sw.ElapsedMilliseconds,
             };
         }
