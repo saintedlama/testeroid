@@ -148,6 +148,7 @@ namespace Testeroid
                             testeroidConfig.ExcludedSourceFiles.ToArray(),
                             testeroidConfig.ExcludeAttributes.ToArray(),
                             false,
+                            false,
                             lastCoverageReport,
                             false,
                             logger
