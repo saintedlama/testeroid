@@ -14,8 +14,8 @@ namespace Testeroid.Tests
 
             var execution = cmd.Execute();
             execution.ExitCode.ShouldBe(0);
-            execution.StandardOutput.ShouldNotBeNullOrWhiteSpace();
             execution.StandardError.ShouldBeNullOrWhiteSpace();
+            execution.StandardOutput.ShouldNotBeNullOrWhiteSpace();
         }
 
         [Fact]
