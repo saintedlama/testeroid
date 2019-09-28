@@ -4,14 +4,9 @@ using McMaster.Extensions.CommandLineUtils;
 using Coverlet.Core;
 using Coverlet.Core.Reporters;
 using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Text;
-using ConsoleTables;
-using System.Xml;
 using System.Linq;
 using Coverlet.Core.Abstracts;
-using Coverlet.Core.Helpers;
 using Testeroid.CommandLine;
 using static Testeroid.CommandLine.CommandLineUI;
 using Testeroid.Reports;
@@ -101,7 +96,7 @@ namespace Testeroid
                 {
                     var build = "dotnet".Execute($"build --configuration {buildConfiguration} {(noRestoreOption.HasValue() ? "--no-restore" : "")}",
                         workingDirectory: workingDirectory.Path.FullName,
-                        timeoutMillisecods: timeoutMilliseconds);
+                        timeoutMilliseconds: timeoutMilliseconds);
 
                     if (build.ExitCode != 0)
                     {
@@ -167,7 +162,7 @@ namespace Testeroid
                         {
                             var dotnetTest = "dotnet".Execute($"test {EscapeDirectory(project.GetDirectory())} --no-build --no-restore {testLogger}",
                                                         workingDirectory: workingDirectory.Path.FullName,
-                                                        timeoutMillisecods: timeoutMilliseconds);
+                                                        timeoutMilliseconds: timeoutMilliseconds);
 
                             Verbose(dotnetTest.StandardOutput);
 
