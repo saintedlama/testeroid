@@ -1,8 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Net.Sockets;
-using System.Text;
-using static Testeroid.CommandLine.CommandLineUI;
 
 namespace Testeroid
 {
@@ -28,31 +25,10 @@ namespace Testeroid
                 }
             };
 
-            var standardOutputBuilder = new StringBuilder();
-            process.OutputDataReceived += (sender, eventArgs) =>
-            {
-                if (!string.IsNullOrEmpty(eventArgs.Data))
-                {
-                    standardOutputBuilder.Append(eventArgs.Data);
-                }
-            };
-
-            var standardErrorBuilder = new StringBuilder();
-            process.ErrorDataReceived += (sender, eventArgs) =>
-            {
-                if (!string.IsNullOrEmpty(eventArgs.Data))
-                {
-                    standardErrorBuilder.Append(eventArgs.Data);
-                }
-            };
-
             process.Start();
 
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
-            
             var hasExited = process.WaitForExit(timeoutMilliseconds);
-            
+
             if (!hasExited)
             {
                 try
@@ -72,8 +48,8 @@ namespace Testeroid
             return new Execution
             {
                 ExitCode = process.ExitCode,
-                StandardOutput = standardOutputBuilder.ToString(),
-                StandardError = standardErrorBuilder.ToString(),
+                StandardOutput = process.StandardOutput.ReadToEnd(),
+                StandardError = process.StandardError.ReadToEnd(),
                 ElapsedMilliseconds = sw.ElapsedMilliseconds,
             };
         }
