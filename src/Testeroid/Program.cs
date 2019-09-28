@@ -170,12 +170,12 @@ namespace Testeroid
                             {
                                 Step(StepResult.Failed, $"Test execution failed for {project.ProjectFile.FullName}");
 
-                                if (!String.IsNullOrWhiteSpace(dotnetTest.StandardError))
+                                if (!string.IsNullOrWhiteSpace(dotnetTest.StandardError))
                                 {
                                     Information(dotnetTest.StandardError);
                                 }
 
-                                if (!String.IsNullOrWhiteSpace(dotnetTest.StandardOutput))
+                                if (!string.IsNullOrWhiteSpace(dotnetTest.StandardOutput))
                                 {
                                     Information(dotnetTest.StandardOutput);
                                 }
@@ -265,7 +265,7 @@ namespace Testeroid
             catch (Exception ex)
             {
                 Verbose($"Could not delete intermediate coverage report {filePath} due to error {ex.Message}");
-                Verbose($"{ex.StackTrace.ToString()}");
+                Verbose($"{ex.StackTrace}");
             }
         }
 
