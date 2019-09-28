@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/saintedlama/versionize) for commit guidelines.
 
-<a name="1.5.0"></a>
+<a name="1.6.0"></a>
+## 1.6.0 (2019-9-28)
+
+### Bug Fixes
+
+* switch to reading stdout and stderr when building the execution result
+* fix stdout and stderr redirection
+
+### Features
+
+* updated coverlet to v5.2.0 tag
+
 ## 1.5.0 (2019-3-21)
 
 ### Features
