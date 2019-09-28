@@ -10,6 +10,8 @@ using System.Text;
 using ConsoleTables;
 using System.Xml;
 using System.Linq;
+using Coverlet.Core.Abstracts;
+using Coverlet.Core.Helpers;
 using Testeroid.CommandLine;
 using static Testeroid.CommandLine.CommandLineUI;
 using Testeroid.Reports;
@@ -20,9 +22,12 @@ namespace Testeroid
     {
         public static int Main(string[] args)
         {
-            var app = new CommandLineApplication();
-            app.Name = "testeroid";
-            app.FullName = "dotnet test on steroids";
+            var app = new CommandLineApplication
+            {
+                Name = "testeroid", 
+                FullName = "dotnet test on steroids"
+            };
+
             app.HelpOption("-h|--help");
             app.VersionOption("-v|--version", GetAssemblyVersion());
 
@@ -55,12 +60,12 @@ namespace Testeroid
             {
                 if (silentOption.HasValue())
                 {
-                    CommandLineUI.Verbosity = VerbosityLevel.Silent;
+                    Verbosity = VerbosityLevel.Silent;
                 }
 
                 if (verboseOption.HasValue())
                 {
-                    CommandLineUI.Verbosity = VerbosityLevel.Verbose;
+                    Verbosity = VerbosityLevel.Verbose;
                 }
 
                 var testFramework = testFrameworkOption.HasValue() ? testFrameworkOption.Value() : "xunit";
@@ -75,7 +80,6 @@ namespace Testeroid
                     "html",
                     "console",
                 };
-
 
                 var timeoutMilliseconds = timeoutOption.HasValue() ? Int32.Parse(timeoutOption.Value()) : 2 * 60 * 1000; // 2 minutes
 
@@ -139,9 +143,11 @@ namespace Testeroid
 
 
                         var logger = new CoverletLogAdapter();
-
-                        Coverage coverage = new Coverage(
-                            testDll,
+                        
+                        var fileSystem = (IFileSystem)DependencyInjection.Current.GetService(typeof(IFileSystem));
+                        var instrumentationHelper = (IInstrumentationHelper)DependencyInjection.Current.GetService(typeof(IInstrumentationHelper));
+ 
+                        var coverage = new Coverage(testDll,
                             testeroidConfig.IncludeFilters.ToArray(),
                             testeroidConfig.IncludeDirectories.ToArray(),
                             testeroidConfig.ExcludeFilters.ToArray(),
@@ -151,9 +157,10 @@ namespace Testeroid
                             false,
                             lastCoverageReport,
                             false,
-                            logger
-                        );
-
+                            logger,
+                            instrumentationHelper,
+                            fileSystem);
+                        
                         coverage.PrepareModules();
 
                         try

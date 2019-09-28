@@ -17,7 +17,7 @@ namespace Testeroid
             Log("Error", exception.Message + exception.StackTrace);
         }
 
-        public void LogInformation(string message)
+        public void LogInformation(string message, bool important = false)
         {
             Log("Info", message);
         }

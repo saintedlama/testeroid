@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testeroid", "src\Testeroid\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testeroid.Tests", "test\Testeroid.Tests\Testeroid.Tests.csproj", "{C997C31B-2E96-4180-B9CA-CD0DAE5B173F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coverlet.core", "coverlet\src\coverlet.core\coverlet.core.csproj", "{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{C997C31B-2E96-4180-B9CA-CD0DAE5B173F}.Release|x64.Build.0 = Release|Any CPU
 		{C997C31B-2E96-4180-B9CA-CD0DAE5B173F}.Release|x86.ActiveCfg = Release|Any CPU
 		{C997C31B-2E96-4180-B9CA-CD0DAE5B173F}.Release|x86.Build.0 = Release|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Debug|x64.Build.0 = Debug|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Debug|x86.Build.0 = Debug|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Release|x64.ActiveCfg = Release|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Release|x64.Build.0 = Release|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Release|x86.ActiveCfg = Release|Any CPU
+		{B06E2E4D-BB80-442C-9113-4A6FAD6F26F5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
