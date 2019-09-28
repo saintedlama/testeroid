@@ -1,27 +1,34 @@
 using System;
 using System.Diagnostics;
+using System.Net.Sockets;
 using System.Text;
+using static Testeroid.CommandLine.CommandLineUI;
 
 namespace Testeroid
 {
     public static class StringExtensions
     {
-        public static Execution Execute(this string cmd, string arguments = null, string workingDirectory = null, int timeoutMillisecods = 2 * 60 * 1000)
+        public static Execution Execute(this string cmd, string arguments = null, string workingDirectory = null, int timeoutMilliseconds = 2 * 60 * 1000)
         {
             var sw = new Stopwatch();
             sw.Start();
 
-            Process process = new Process();
-            process.StartInfo.WorkingDirectory = workingDirectory;
-            process.StartInfo.FileName = cmd;
-            process.StartInfo.Arguments = arguments;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
+            var process = new Process
+            {
+                StartInfo =
+                {
+                    WorkingDirectory = workingDirectory,
+                    FileName = cmd,
+                    Arguments = arguments,
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    
+                }
+            };
 
-            StringBuilder standardOutputBuilder = new StringBuilder();
-            StringBuilder standardErrorBuilder = new StringBuilder();
-
+            var standardOutputBuilder = new StringBuilder();
             process.OutputDataReceived += (sender, eventArgs) =>
             {
                 if (!string.IsNullOrEmpty(eventArgs.Data))
@@ -30,6 +37,7 @@ namespace Testeroid
                 }
             };
 
+            var standardErrorBuilder = new StringBuilder();
             process.ErrorDataReceived += (sender, eventArgs) =>
             {
                 if (!string.IsNullOrEmpty(eventArgs.Data))
@@ -40,8 +48,11 @@ namespace Testeroid
 
             process.Start();
 
-            var hasExited = process.WaitForExit(timeoutMillisecods);
-
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+            
+            var hasExited = process.WaitForExit(timeoutMilliseconds);
+            
             if (!hasExited)
             {
                 try
@@ -53,7 +64,7 @@ namespace Testeroid
                     throw new ProcessTerminationException($"Could not kill the non exiting process due to exception", ex);
                 }
 
-                throw new ProcessTerminationException($"The process did not exit within the defined timeout of {timeoutMillisecods}ms");
+                throw new ProcessTerminationException($"The process did not exit within the defined timeout of {timeoutMilliseconds}ms");
             }
 
             sw.Stop();
