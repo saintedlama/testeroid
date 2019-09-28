@@ -19,6 +19,7 @@ namespace Testeroid
                     Arguments = arguments,
                     CreateNoWindow = true,
                     UseShellExecute = false,
+                    ErrorDialog = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     
